@@ -340,7 +340,7 @@ def move(arg1, arg2, arg3, arg4, arg5=None, arg6=None):
         tf = arg6
         x1, y1 = round_format_str(arg1), round_format_str(arg2, 4)
         x2, y2 = round_format_str(arg3), round_format_str(arg4, 4)
-        return '\\move({:s},{:s},{:s},{:s},{:s},{:s})'.format(
+        return '\\move({:s},{:s},{:s},{:s},{:d},{:d})'.format(
             x1, y1, x2, y2, ti, tf)
 
 

@@ -183,7 +183,7 @@ class Writer(object):
         return "\n".join(aegisub)
 
     def _resolution(self):
-        return "PlayResX: 704\nPlayResY: 528".format(
+        return "PlayResX: {:d}\nPlayResY: {:d}".format(
             *self._assdict["resolution"])
 
     def _tostring(self):

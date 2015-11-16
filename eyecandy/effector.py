@@ -313,7 +313,7 @@ class Line(Dialog):
             actor = actor if actor else self.actor
             effect = effect if effect else self.effect
 
-            width = Text(style, text).width
+            width = Text(style, text).width + self.style._fix_width
 
             # Absolute times
             start = line_start
@@ -358,7 +358,7 @@ class Line(Dialog):
                 start = line_start
                 line_start += duration
 
-                width = Text(s.style, char).width
+                width = Text(s.style, char).width + self.style._fix_width
 
                 if ci == char_n - 1:
                     # Ensure that the end time and the width of the last char
@@ -433,6 +433,7 @@ class Style(object):
         self._marginl = style["margin"]["l"]
         self._marginr = style["margin"]["r"]
         self._marginv = style["margin"]["v"]
+        self._fix_width = style.get("fix_width", 0)
 
     name = property(attrgetter("_name"))
     fontname = property(attrgetter("_fontname"))
@@ -503,6 +504,8 @@ class Generator(object):
 
         self._dialog = []
 
+        self.kara_n = len(self.lines)
+
         # Add default Style
         try:
             self.get_style("Default")
@@ -563,6 +566,9 @@ class Generator(object):
 
     def get_style(self, name):
         return Style(name, self._script_data["style"][name])
+
+    def style_fix_width(self, name, fix_width):
+        self._script_data["style"][name]["fix_width"] = fix_width
 
     @property
     def styles(self):
