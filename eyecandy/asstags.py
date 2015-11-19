@@ -117,7 +117,7 @@ interpolate_range = interpolate.interpolate_range
 
 
 def color_range(n, tipo=1, *colors):
-    return (c(tipo, c) for c in color.gradient_bezier(colors, n))
+    return (c(tipo, clr) for clr in color.gradient_bezier(colors, n))
 
 
 def bord(xb=1, yb=None):

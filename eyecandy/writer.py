@@ -5,8 +5,10 @@ import os
 
 try:
     import asstime
+    import helpers
 except ImportError:
     from . import asstime
+    from . import helpers
 
 
 STYLE_FORMAT = (
@@ -58,7 +60,8 @@ class Writer(object):
 
     def _dialog(self):
         dialog_fmt = []
-        for dialog in self._assdict["dialog"]:
+        for dialog in helpers.progressbar(
+                self._assdict["dialog"], prefix='Writing'):
             if dialog["comment"]:
                 key = "Comment"
             else:

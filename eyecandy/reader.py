@@ -3,6 +3,10 @@
 import codecs
 import sys
 
+try:
+    import helpers
+except ImportError:
+    from . import helpers
 
 COMMENT_CHARS = [";", "!:"]
 VIDEO_ZOOM = {'12.5%': 1, '25%': 2, '37.5%': 3, '50%': 4, '62.5%': 5, '75%': 6,
@@ -62,7 +66,8 @@ class Reader(object):
         assfile = self._open(filename)
         SKIP_CHARS = COMMENT_CHARS[:]
         SKIP_CHARS.append("[")
-        for line in assfile:
+        for line in helpers.progressbar(
+                assfile.readlines(), prefix='Reading', sufix='Lines'):
             line = line.strip()
             if line.startswith(tuple(SKIP_CHARS)) or not line:
                 continue
