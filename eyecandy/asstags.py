@@ -58,11 +58,11 @@ def rand(v1, v2=None):
 
 
 def randf(v1=None, v2=None):
-    if not v2:
+    if not v1 and not v2:
+        return random.random()
+    elif not v2:
         v2 = v1
         v1 = -v2
-    if not v1:
-        return random.random()
     return random.uniform(v1, v2)
 
 
@@ -688,10 +688,12 @@ def shape_ellipse(w, h):
 
 
 def shape_pixel():
-    return shape_square(width=1, height=1)
+    return shape_square(1)
 
 
-def shape_square(width=1, height=1):
+def shape_square(width=1, height=None):
+    if not height:
+        height = width
     pt = draw('m', 0, 0)
     pt += draw('l', width, 0)
     pt += draw('l', width, height)
@@ -742,7 +744,7 @@ def shape_max(shape):
         return abs(float(n))
 
     pattern = "(-?\d+.d+|-?\d+)\s(-?\d+.d+|-?\d+)"
-    coords = [map(abs_float, n) for n in re.findall(pattern, shape)]
+    coords = [list(map(abs_float, n)) for n in re.findall(pattern, shape)]
     maxx = max(coords, key=operator.itemgetter(0))[0]
     maxy = max(coords, key=operator.itemgetter(1))[1]
     return maxx, maxy

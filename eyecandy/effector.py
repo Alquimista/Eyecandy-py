@@ -158,7 +158,7 @@ class Dialog(object):
         self.end = Time.from_strtime(dialog["end"])
         self.style = Style(dialog["style"]["name"], dialog["style"])
         self.actor = dialog["actor"]
-        self.effect = dialog["end"]
+        self.effect = dialog["effect"]
         self.text = dialog["text"]
         self.comment = dialog["comment"]
         self.tag = ""
@@ -298,11 +298,13 @@ class Line(Dialog):
         for i, syl in enumerate(re_syls):
             match = re.match("(\s*)(\w+)(\s*)", list(syl)[-1])
             if match:
-                prespace, _, postspace = match.groups()
+                prespace, syltext, postspace = match.groups()
                 if prespace:
                     if i > 0:
                         re_syls[i - 1][-1] = re_syls[i - 1][-1] + prespace
-                        re_syls[i][-1] = _ + postspace
+                        re_syls[i][-1] = syltext + postspace
+                    else:
+                        re_syls[i][-1] = syltext
 
         for i, match in enumerate(re_syls):
             duration, style, actor, effect, text = match
@@ -504,7 +506,7 @@ class Generator(object):
 
         self._dialog = []
 
-        self.kara_n = len(self.lines)
+        self.kara_n = len(list(self.lines))
 
         # Add default Style
         try:
@@ -608,7 +610,8 @@ class Generator(object):
     @property
     def dialogs(self):
         D = partial(Dialog, resolution=self.resolution)
-        dialogs = list(map(D, self._script_data["dialog"]))
+        dialogs = [D(d) for d in self._script_data[
+            "dialog"] if d["comment"] == False]
         if self.progressbar:
             return helpers.progressbar(dialogs)
         return dialogs
@@ -639,7 +642,10 @@ class Generator(object):
     @property
     def lines(self):
         L = partial(Line, resolution=self.resolution)
-        lines = list(map(L, self._script_data["dialog"]))
+        lines = [L(l) for l in self._script_data[
+            "dialog"] if l["comment"] == False]
+        if self.progressbar:
+            return helpers.progressbar(lines)
         return lines
 
     def _add_default_dialog(self):
