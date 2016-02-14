@@ -659,6 +659,7 @@ class Generator(object):
         self.add_dialog(text='### Karaoke Effect ###', comment=True)
 
     def save(self):
+        # FIX: Don't change alignment in rawlinesS
         for name in self._script_data["style"].keys():
             self._script_data["style"][name]["alignment"] = 5
         self._script_data["dialog"] = self._dialog

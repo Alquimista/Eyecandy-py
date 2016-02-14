@@ -272,15 +272,18 @@ def a(arg1, arg2=None):
     @opacity:
     Acepta valores decimales entre 0 y 255,
     ó hexadecimales entre "00" y "FF".
+
+    0: opaco
+    255: transparente
     """
     # acepta decimal y hexadecimal
     if arg2 != None:
         tipo = arg1
         opacity = arg2
         try:
-            alfa = dec2hex(255 - opacity)
+            alfa = dec2hex(opacity)
         except (TypeError, ValueError):
-            alfa = dec2hex(255 - hex2dec(opacity))
+            alfa = dec2hex(hex2dec(opacity))
         if tipo not in (1, 2, 3, 4):
             raise ValueError('\n\nc(tipo,valor):\n'
                              '<tipo> solo acepta numeros entre 1 y 4')
@@ -289,9 +292,9 @@ def a(arg1, arg2=None):
     else:
         opacity = arg1
         try:
-            alfa = dec2hex(255 - opacity)
+            alfa = dec2hex(opacity)
         except (TypeError, ValueError):
-            alfa = dec2hex(255 - hex2dec(opacity))
+            alfa = dec2hex(hex2dec(opacity))
         return '\\alpha&H{:s}&'.format(alfa)
 
 

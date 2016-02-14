@@ -150,6 +150,7 @@ class Reader(object):
         assfile.close()
 
         # Add style to dialogs
+        # FIX: Need for default style
         dialog = []
         if temp_dialog:
             for d in temp_dialog:
