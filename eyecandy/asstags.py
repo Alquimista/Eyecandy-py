@@ -796,6 +796,11 @@ def translate_shape(shape, x, y):
     return shape_filter(shape, move)
 
 
+def center_shape(shape):
+    maxx, maxy = shape_max(shape)
+    return translate_shape(shape, -maxx / 2, -maxy / 2)
+
+
 def scale_shape(shape, x, y=None):
 
     # translate to origin
@@ -810,6 +815,14 @@ def scale_shape(shape, x, y=None):
         return round_format_str(px, 2) + " " + round_format_str(py, 2)
 
     return shape_filter(shape, scale)
+
+
+def flip_shape(shape):
+
+    def flip(m):
+        return str(0 - int(m.group(1))) + " " + m.group(2)
+
+    return shape_filter(shape, flip)
 
 
 def shape_to_bezier(steps, shape):

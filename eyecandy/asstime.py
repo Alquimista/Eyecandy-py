@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
+import fractions
 import re
 
-FPS_NTSC_FILM = 24000 / 1001
-FPS_NTSC = 30000 / 1001
-FPS_NTSC_DOUBLE = 60000 / 1001
-FPS_NTSC_QUAD = 120000 / 1001
+
+FPS_NTSC_FILM = fractions.Fraction(24000, 1001)
+FPS_NTSC = fractions.Fraction(30000, 1001)
+FPS_NTSC_DOUBLE = fractions.Fraction(60000, 1001)
+FPS_NTSC_QUAD = fractions.Fraction(120000, 1001)
 FPS_FILM = 24
 FPS_PAL = 25
 FPS_PAL_DOUBLE = 50
@@ -170,13 +172,13 @@ class Time(object):
         return cls(s_to_ms(s))
 
     @classmethod
-    def from_frames(cls, frames, framerate=FPS_NTSC_FILM):
+    def from_frame(cls, frame, framerate=FPS_NTSC_FILM):
         """Create new `Time` from frames
 
         @frames: frames
         @framerate: framerate
         """
-        return cls(frames_to_ms(frames, framerate))
+        return cls(frames_to_ms(frame, framerate))
 
     @classmethod
     def from_strtime(cls, time):

@@ -40,9 +40,7 @@ RE_TAGS = re.compile(
 RE_KARA = re.compile(
     r'''
     (?<=[\\k|\\ko|\\kf])(?P<duration>\d+)    # k duration in centiseconds
-    (?:(?:\|s\:)*(?P<kstyle>[\w\d]+)*        # k style
-    (?:\|a\:)*(?P<kactor>[\w\d]+)*           # k actor
-    (?:\|e\:)*(?P<keffect>[\w\d]+)*)*        # k effect
+    (?:\-)*(?P<inline>[\w\d]+)*               # inline
     (?:\\[\w\d]+)*                           # ignore tags
     }(?P<text>[^\{\}]*)                      # text
     ''',
@@ -307,15 +305,15 @@ class Line(Dialog):
                         re_syls[i][-1] = syltext
 
         for i, match in enumerate(re_syls):
-            duration, style, actor, effect, text = match
+            duration, inline, text = match
 
             # The time in duration is in centisecond
             duration = Time.from_cs(int(duration))
-            style = self.get_style(style) if style else self.style
-            actor = actor if actor else self.actor
-            effect = effect if effect else self.effect
+            style = self.style
+            actor = self.actor
+            effect = self.effect
 
-            width = Text(style, text).width + self.style._fix_width
+            width = Text(style, text).width + style._fix_width
 
             # Absolute times
             start = line_start
@@ -330,7 +328,7 @@ class Line(Dialog):
             syl_item = {
                 "layer": self.layer,
                 "start": start.strtime, "end": end.strtime,
-                "style": style.as_dict(), "actor": actor,
+                "style": style.as_dict(), "actor": actor, "inline": inline,
                 "effect": effect, "text": text.strip(), "comment": False}
 
             syllabes.append(Syl(syl_item, self.resolution, sleft))
@@ -373,6 +371,7 @@ class Line(Dialog):
                     "layer": s.layer,
                     "start": start.strtime, "end": end.strtime,
                     "style": s.style.as_dict(), "actor": s.actor,
+                    "inline": s.inline,
                     "effect": s.effect, "text": char.strip(),
                     "comment": False,
                     "sylstart": s.start,
@@ -391,6 +390,7 @@ class Syl(Line):
 
     def __init__(self, dialog, resolution, sleft):
         super(Syl, self).__init__(dialog, resolution)
+        self.inline = dialog["inline"]
         self.left = sleft
         self.center = self.left + self.width / 2
         self.right = self.left + self.width
@@ -404,6 +404,7 @@ class Char(Line):
     def __init__(self, dialog, resolution, cleft):
         super(Char, self).__init__(dialog, resolution)
         self.left = cleft
+        self.inline = dialog["inline"]
         self.center = self.left + self.width / 2
         self.right = self.left + self.width
         self.x, self.y = self.center, self.middle
@@ -496,7 +497,7 @@ class Generator(object):
 
     """docstring for Generator"""
 
-    def __init__(self, input_script, output_script, progressbar=True,
+    def __init__(self, input_script, output_script=None, progressbar=True,
                  original=True, open=True):
         self._input_script = input_script
         self._output_script = output_script
@@ -569,8 +570,13 @@ class Generator(object):
     def get_style(self, name):
         return Style(name, self._script_data["style"][name])
 
-    def style_fix_width(self, name, fix_width):
-        self._script_data["style"][name]["fix_width"] = fix_width
+    def style_fix_width(self, fix_width, name=None):
+        if name:
+            self._script_data["style"][name]["fix_width"] = fix_width
+        else:
+            for style in self._script_data["style"]:
+                self._script_data["style"][style][
+                    "fix_width"] = fix_width
 
     @property
     def styles(self):
@@ -658,14 +664,23 @@ class Generator(object):
             self.add(d)
         self.add_dialog(text='### Karaoke Effect ###', comment=True)
 
-    def save(self):
-        # FIX: Don't change alignment in rawlinesS
+    def tostring(self):
+        # FIX: Don't change alignment in rawlines
         for name in self._script_data["style"].keys():
             self._script_data["style"][name]["alignment"] = 5
         self._script_data["dialog"] = self._dialog
-        Writer(self._script_data).save(self._output_script)
+        return Writer(self._script_data)._tostring()
+
+    def save(self, filename=None):
+        # FIX: Don't change alignment in rawlines
+        if not filename:
+            filename = self._output_script
+        for name in self._script_data["style"].keys():
+            self._script_data["style"][name]["alignment"] = 5
+        self._script_data["dialog"] = self._dialog
+        Writer(self._script_data).save(filename)
         if self.open:
-            helpers.start_file(self._output_script)
+            helpers.start_file(filename)
 
 
 # class Fx():

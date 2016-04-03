@@ -34,7 +34,7 @@ class Writer(object):
         # Default values
         # Default resolution if resolution is not present
         if not all(self._assdict["resolution"]):
-            self._assdict["resolution"] = [640, 480]
+            self._assdict["resolution"] = [1280, 720]
         if not self._assdict["style"]:
             self._assdict["style"] = {
                 "Default": {
