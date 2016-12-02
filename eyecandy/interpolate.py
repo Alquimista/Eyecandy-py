@@ -105,7 +105,13 @@ def cubic_deccelaration(t, start, end):
     return linear(t, start, end)
 
 
+def sigmoid(t, start, end):
+    t = 1 / (1 + math.exp(-t))
+    return linear(t, start, end)
+
 # http://cubic-bezier.com
+
+
 def custom_curve(t, curve, start, end):
     t = bezier_curve(t, curve)
     return linear(t, start, end)

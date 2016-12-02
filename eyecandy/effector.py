@@ -40,7 +40,7 @@ RE_TAGS = re.compile(
 RE_KARA = re.compile(
     r'''
     (?<=[\\k|\\ko|\\kf])(?P<duration>\d+)    # k duration in centiseconds
-    (?:\-)*(?P<inline>[\w\d]+)*               # inline
+    (?:\-)*(?P<inline>[\w\d]+)*              # inline
     (?:\\[\w\d]+)*                           # ignore tags
     }(?P<text>[^\{\}]*)                      # text
     ''',
@@ -719,11 +719,7 @@ def main():
     import random
     import color
 
-    # def it_custom(t, start, end):
-    #     t = 0.5 - ((math.cos(4 * math.pi * t)) / 2)
-    #     return interpolate.linear(t, start, end)
-
-    it_custom = partial(interpolate.cosine, repeat=4)
+    it_custom = partial(interpolate.cosine, repeat=6)
 
     sub = Generator("../tests/test.ass",
                     "../tests/test_writer.ass")
@@ -739,11 +735,10 @@ def main():
         c3 = line.style.bordcolor
         c4 = line.style.shadowcolor
 
-        cblue = color.Color.from_hex("#8BABAE")
+        cblue = color.Color.from_hex("#93BEC2")
         colorsb = list(cblue.gradient(c1, len(line.chars), it_custom))
         i_custom = list(interpolate.interpolate_range(
             0, 1, line.char_n, it_custom))
-        partial
 
         for li, char in enumerate(line.chars):
             # alias for .center, .middle
@@ -752,7 +747,7 @@ def main():
             # Efecto de silaba
             ch = char.copy()
             ch.tag = (pos(x, y) + blur() + c(c2) + fsc(130) +
-                      t(fsc(100) + blur(2) + c(c1)) + an(1))
+                      t(fsc(100) + blur(2) + c(colorsb[li])) + an(1))
             ch.layer = 1
             ch.end = char.end + 50
             if ch.end.ms >= line.end.ms:

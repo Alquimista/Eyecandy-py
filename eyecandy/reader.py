@@ -78,7 +78,7 @@ class Reader(object):
                 # Dialogue, Comment, Style
                 if key == "dialogue" or key == "comment":
                     value = value.split(",", 9)
-                    text = value[9]
+                    text = value[9].strip()
                     if not text:  # Skip on Empty dialog
                         continue
                     dialog_item = {
@@ -87,7 +87,7 @@ class Reader(object):
                         "end": value[2],
                         "style": value[3],
                         # marginl, marginr, marginl = "0000"
-                        "actor": value[4],
+                        "actor": value[7],
                         "effect": value[8],
                         "text": text,
                         "comment": key == "comment",  # commented (True/False)
@@ -130,8 +130,10 @@ class Reader(object):
                     video = value
                 elif key == "audio_uri" or key == "audio_file":
                     audio = value
-                elif key == "video_zoom" or key == "video_zoom_percent":
-                    video_zoom = value
+                elif key == "video_zoom_percent":
+                    video_zoom = float(value)
+                elif key == "video_zoom":
+                    video_zoom = float(value.replace(r"%", "")) / 100
                 elif (key == "video_aspect_ratio" or key == "video_ar_value" or
                         key == "aegisub_video_aspect_ratio"):
                     video_aspect_ratio = value.replace("c", "")
@@ -158,11 +160,6 @@ class Reader(object):
                 dialog.append(d)
         else:
             dialog = None
-
-        try:
-            video_zoom = VIDEO_ZOOM_INV[VIDEO_ZOOM[video_zoom]]
-        except KeyError:
-            video_zoom = float(video_zoom)
 
         try:
             num, den = video_aspect_ratio.split(':')

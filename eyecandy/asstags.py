@@ -116,8 +116,8 @@ bezier_curve_range = interpolate.bezier_curve_range
 interpolate_range = interpolate.interpolate_range
 
 
-def color_range(n, tipo=1, *colors):
-    return (c(tipo, clr) for clr in color.gradient_bezier(colors, n))
+def color_range(n, *colors):
+    return (clr for clr in color.gradient_bezier(colors, n))
 
 
 def bord(xb=1, yb=None):
@@ -796,16 +796,12 @@ def translate_shape(shape, x, y):
     return shape_filter(shape, move)
 
 
-def center_shape(shape):
-    maxx, maxy = shape_max(shape)
-    return translate_shape(shape, -maxx / 2, -maxy / 2)
+# def center_shape(shape):
+#     maxx, maxy = shape_max(shape)
+#     return translate_shape(shape, -maxx / 2, -maxy / 2)
 
 
 def scale_shape(shape, x, y=None):
-
-    # translate to origin
-    # rotate
-    # translate original position
 
     if not y:
         y = x
