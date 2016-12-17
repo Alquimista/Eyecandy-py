@@ -39,9 +39,9 @@ RE_TAGS = re.compile(
     re.IGNORECASE | re.UNICODE | re.VERBOSE)
 RE_KARA = re.compile(
     r'''
-    (?<=[\\k|\\ko|\\kf])(?P<duration>\d+)    # k duration in centiseconds
+    {\\k[of]?(?P<duration>\d+)               # k duration in centiseconds
     (?:\-)*(?P<inline>[\w\d]+)*              # inline
-    (?:\\[\w\d]+)*                           # ignore tags
+    (?: \s *}\s*{[\s\w\d]+) *                # ignore tags
     }(?P<text>[^\{\}]*)                      # text
     ''',
     re.IGNORECASE | re.UNICODE | re.VERBOSE)
@@ -255,9 +255,9 @@ class Line(Dialog):
             lcenter = lleft + middlewidth
             lright = lleft + width
         elif align == 2 or align == 5 or align == 8:    # center
-            lcenter = resx / 2
-            lleft = lcenter - middlewidth
-            lright = lcenter + middlewidth
+            lleft = resx / 2 - middlewidth
+            lcenter = lleft + middlewidth
+            lright = lleft + width
         elif align == 3 or align == 6 or align == 9:    # right
             lleft = resx - mr - width
             lcenter = lleft + middlewidth
@@ -289,20 +289,7 @@ class Line(Dialog):
         re_syls = re.findall(RE_KARA, self._rawtext)
         syl_n = len(re_syls)
 
-        # fix prespace
-        #    input: {\k30}ka{\k16} shi
-        #    output: {\k30}ka {\k16}shi
-        re_syls = [list(syl) for syl in re_syls]
-        for i, syl in enumerate(re_syls):
-            match = re.match("(\s*)(\w+)(\s*)", list(syl)[-1])
-            if match:
-                prespace, syltext, postspace = match.groups()
-                if prespace:
-                    if i > 0:
-                        re_syls[i - 1][-1] = re_syls[i - 1][-1] + prespace
-                        re_syls[i][-1] = syltext + postspace
-                    else:
-                        re_syls[i][-1] = syltext
+        spacewidth = Text(self.style, " ").width
 
         for i, match in enumerate(re_syls):
             duration, inline, text = match
@@ -313,7 +300,11 @@ class Line(Dialog):
             actor = self.actor
             effect = self.effect
 
-            width = Text(style, text).width + style._fix_width
+            prespace = len(text) - len(text.lstrip())
+            postspace = len(text) - len(text.rstrip())
+
+            sleft += prespace * spacewidth
+            width = Text(style, text.strip()).width + style._fix_width
 
             # Absolute times
             start = line_start
@@ -332,7 +323,7 @@ class Line(Dialog):
                 "effect": effect, "text": text.strip(), "comment": False}
 
             syllabes.append(Syl(syl_item, self.resolution, sleft))
-            sleft += width
+            sleft += width + postspace * spacewidth
 
         return syllabes
 

@@ -104,7 +104,6 @@ class Writer(object):
                     sty["color"]["secondary"],
                     sty["color"]["bord"],
                     sty["color"]["shadow"],
-                    # change flags -1, 0, to a bool type
                     _ASSBOOL[sty["bold"]],
                     _ASSBOOL[sty["italic"]],
                     "0",  # underline
@@ -120,7 +119,7 @@ class Writer(object):
                     sty["margin"]["l"],
                     sty["margin"]["r"],
                     sty["margin"]["v"],
-                    "0"))
+                    "1"))
         return "\n".join(styles)
 
     def _metadata(self):

@@ -4,6 +4,7 @@
 from __future__ import division
 
 import random
+import re
 
 import eyecandy
 from eyecandy import interpolate, color

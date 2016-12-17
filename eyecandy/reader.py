@@ -73,7 +73,7 @@ class Reader(object):
                 continue
             else:
                 key, value = line.split(":", 1)
-                key = key.lower().replace("+", "p").replace(" ", "_")
+                key = key.lower().replace(" ", "_")
                 value = value.strip()
                 # Dialogue, Comment, Style
                 if key == "dialogue" or key == "comment":
@@ -86,8 +86,8 @@ class Reader(object):
                         "start": value[1],
                         "end": value[2],
                         "style": value[3],
+                        "actor": value[4],
                         # marginl, marginr, marginl = "0000"
-                        "actor": value[7],
                         "effect": value[8],
                         "text": text,
                         "comment": key == "comment",  # commented (True/False)
