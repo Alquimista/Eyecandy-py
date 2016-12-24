@@ -329,7 +329,6 @@ class Line(Dialog):
 
     def _chars(self):
         charas = []
-        n = 1
         for i, s in enumerate(self.syls):
 
             cleft = s.left
@@ -706,6 +705,8 @@ class Generator(object):
 @helpers.timeit
 def main():
 
+    from asstags import *
+
     import interpolate
     import random
     import color
@@ -783,7 +784,4 @@ def main():
 
 
 if __name__ == '__main__':
-    from pprint import pprint
-
-    from asstags import *
     main()
