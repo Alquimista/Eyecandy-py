@@ -34,7 +34,7 @@ def fact(n):
 # NyuFx
 # Binomial coefficient
 def binomial(i, n):
-    return (fact(n) / float(fact(i) * fact(n - i)))
+    return fact(n) / (fact(i) * fact(n - i))
 
 
 # Bernstein polynom
@@ -241,7 +241,7 @@ def interpolate_range(start, end, steps, func=linear, repeat=None):
 
 
 def interpolate_circle_range(steps, func=linear):
-    return interpolate_range(0, 360, steps, func)
+    return list(interpolate_range(0, 360, steps + 1, func))[:steps]
 
 
 def bezier_curve_range(steps, points):

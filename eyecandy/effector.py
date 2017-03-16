@@ -37,11 +37,18 @@ RE_TAGS = re.compile(
                                 # {comment}{\be1}{\k86}fai{\k20}ry --> fairy
     ''',
     re.IGNORECASE | re.UNICODE | re.VERBOSE)
+
+RE_TAGS2 = re.compile(
+    r'''({[^k]+})*               # remove ssatags
+                                 # {comment}{\be1}{\k86}fai{\k20}ry -->
+                                 # {\k86}fai{\k20}ry
+    ''',
+    re.IGNORECASE | re.UNICODE | re.VERBOSE)
+
 RE_KARA = re.compile(
     r'''
     {\\k[of]?(?P<duration>\d+)               # k duration in centiseconds
     (?:\-)*(?P<inline>[\w\d]+)*              # inline
-    (?: \s *}\s*{[\s\w\d]+) *                # ignore tags
     }(?P<text>[^\{\}]*)                      # text
     ''',
     re.IGNORECASE | re.UNICODE | re.VERBOSE)
@@ -286,7 +293,7 @@ class Line(Dialog):
         line_end = self.end
         sleft = self.left
 
-        re_syls = re.findall(RE_KARA, self._rawtext)
+        re_syls = re.findall(RE_KARA, re.sub(RE_TAGS2, "", self._rawtext))
         syl_n = len(re_syls)
 
         spacewidth = Text(self.style, " ").width

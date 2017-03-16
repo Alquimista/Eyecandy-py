@@ -43,6 +43,8 @@ def angle(x1, y1, x2=None, y2=None):
     else:
         dx, dy = x2 - x1, y2 - y1
     angle = math.atan2(dx, dy)
+    if angle < 0:
+        angle += math.Pi * 2.0
     return math.degrees(angle)
 
 
@@ -106,8 +108,7 @@ def circle_range(n, x, y, radius, func=interpolate.DEFAULT_INTERPOLATE):
     @x, @y: centro del circulo.
     @r: radio del circulo.
     """
-    crange = list(interpolate.inerpolate_circle_range(n + 1, func))[:-1]
-    for angle in crange:
+    for angle in interpolate.inerpolate_circle_range(n, func):
         cx, cy = polar2rec(radius, angle)
         yield x + cx, y + cy
 
