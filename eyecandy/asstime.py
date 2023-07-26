@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 import fractions
 import re
-
 
 FPS_NTSC_FILM = fractions.Fraction(24000, 1001)
 FPS_NTSC = fractions.Fraction(30000, 1001)
@@ -22,7 +21,7 @@ def ms_to_strtime(timems):
     m, s = divmod(s, 60)
     h, m = divmod(m, 60)
     cs, ms = divmod(ms, 10)
-    return '{:01d}:{:02d}:{:02d}.{:02d}'.format(h, m, s, cs)
+    return "{:01d}:{:02d}:{:02d}.{:02d}".format(h, m, s, cs)
 
 
 def ms_to_cs(ms):
@@ -185,7 +184,7 @@ class Time(object):
         """Create new `Time` from ASS time string
 
         @time: sting time.
-               H:MM:SS.CC (H=Hour, M=Minute, S=Second, C=centisecond)
+        H:MM:SS.CC (H=Hour, M=Minute, S=Second, C=centisecond)
         """
         return cls(strtime_to_ms(time))
 

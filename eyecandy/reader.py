@@ -9,14 +9,40 @@ except ImportError:
     from . import helpers
 
 COMMENT_CHARS = [";", "!:"]
-VIDEO_ZOOM = {'12.5%': 1, '25%': 2, '37.5%': 3, '50%': 4, '62.5%': 5, '75%': 6,
-              '87.5%': 7, '100%': 8, '125.5%': 9, '137.5%': 10, '150%': 11,
-              '162.5%': 12, '175%': 13, '187.5%': 14, '200%': 15}
+VIDEO_ZOOM = {
+    "12.5%": 1,
+    "25%": 2,
+    "37.5%": 3,
+    "50%": 4,
+    "62.5%": 5,
+    "75%": 6,
+    "87.5%": 7,
+    "100%": 8,
+    "125.5%": 9,
+    "137.5%": 10,
+    "150%": 11,
+    "162.5%": 12,
+    "175%": 13,
+    "187.5%": 14,
+    "200%": 15,
+}
 VIDEO_ZOOM_INV = {
-    1: '0.125000', 2: '0.250000', 3: '0.375000', 4: '0.500000',
-    5: '0.625000', 6: '0.750000', 7: '0.875000', 8: '1.000000',
-    9: '1.255000', 10: '1.375000', 11: '1.500000', 12: '1.625000',
-    13: '1.750000', 14: '1.875000', 15: '2.000000'}
+    1: "0.125000",
+    2: "0.250000",
+    3: "0.375000",
+    4: "0.500000",
+    5: "0.625000",
+    6: "0.750000",
+    7: "0.875000",
+    8: "1.000000",
+    9: "1.255000",
+    10: "1.375000",
+    11: "1.500000",
+    12: "1.625000",
+    13: "1.750000",
+    14: "1.875000",
+    15: "2.000000",
+}
 
 
 class Reader(object):
@@ -37,8 +63,7 @@ class Reader(object):
         :param filename: filename of the script to read
         """
         filename = filename if filename else self._filename
-        error = ("*%s* does not exist, try again with "
-                 "another file") % (filename)
+        error = ("*%s* does not exist, try again with " "another file") % (filename)
         try:
             file = codecs.open(filename, "rb", "utf-8-sig")
         except IOError:
@@ -55,8 +80,7 @@ class Reader(object):
         style = {}
 
         # Audio & Video Data
-        video, video_zoom, video_position, video_aspect_ratio = (
-            None, None, None, None)
+        video, video_zoom, video_position, video_aspect_ratio = (None, None, None, None)
         playresx, playresy = None, None
         audio = None
 
@@ -67,7 +91,8 @@ class Reader(object):
         SKIP_CHARS = COMMENT_CHARS[:]
         SKIP_CHARS.append("[")
         for line in helpers.progressbar(
-                assfile.readlines(), prefix='Reading', sufix='Lines'):
+            assfile.readlines(), prefix="Reading", sufix="Lines"
+        ):
             line = line.strip()
             if line.startswith(tuple(SKIP_CHARS)) or not line:
                 continue
@@ -97,14 +122,13 @@ class Reader(object):
                     value = value.split(",", 22)
                     style_item = {
                         "name": value[0],
-                        "font": {
-                            "name": value[1],
-                            "size": int(value[2])},
+                        "font": {"name": value[1], "size": int(value[2])},
                         "color": {
                             "primary": value[3],
                             "secondary": value[4],
                             "bord": value[5],
-                            "shadow": value[6]},
+                            "shadow": value[6],
+                        },
                         "bold": bool(int(value[7])),
                         "italic": bool(int(value[8])),
                         # Underline, StrikeOut = False (-1)
@@ -118,7 +142,8 @@ class Reader(object):
                         "margin": {
                             "l": int(value[19]),
                             "r": int(value[20]),
-                            "v": int(value[21])},
+                            "v": int(value[21]),
+                        },
                         # Encoding = 0,
                     }
                     style[value[0]] = style_item
@@ -134,8 +159,11 @@ class Reader(object):
                     video_zoom = float(value)
                 elif key == "video_zoom":
                     video_zoom = float(value.replace(r"%", "")) / 100
-                elif (key == "video_aspect_ratio" or key == "video_ar_value" or
-                        key == "aegisub_video_aspect_ratio"):
+                elif (
+                    key == "video_aspect_ratio"
+                    or key == "video_ar_value"
+                    or key == "aegisub_video_aspect_ratio"
+                ):
                     video_aspect_ratio = value.replace("c", "")
                 elif key == "title":
                     title = value
@@ -162,7 +190,7 @@ class Reader(object):
             dialog = None
 
         try:
-            num, den = video_aspect_ratio.split(':')
+            num, den = video_aspect_ratio.split(":")
             video_aspect_ratio = float(num / den)
         except ValueError:
             video_aspect_ratio = float(video_aspect_ratio)
@@ -185,7 +213,7 @@ class Reader(object):
                 "original_script": original_script,
                 "translation": translation,
                 "timing": timing,
-            }
+            },
         }
         return ass
 

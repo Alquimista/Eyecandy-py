@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
-#-*- coding:utf-8 -*-
-from __future__ import (absolute_import, division,
-                        with_statement, print_function)
+# -*- coding:utf-8 -*-
+from __future__ import absolute_import, division, print_function, with_statement
 
 import math
 
@@ -17,10 +16,10 @@ _fact_cache = {}
 
 
 def fact(n):
-    ''' Memoized factorial function '''
+    """Memoized factorial function"""
     try:
         return _fact_cache[n]
-    except(KeyError):
+    except KeyError:
         if n == 1 or n == 0:
             result = 1
         else:
@@ -30,6 +29,7 @@ def fact(n):
 
 
 # fact = math.factorial
+
 
 # NyuFx
 # Binomial coefficient
@@ -60,7 +60,7 @@ def linear(t, start, end):
 # For gradient Color correction
 # https://youtu.be/LKnqECcg6Gw
 def linear_squared(t, start, end):
-    return math.sqrt(linear(t, start ** 2, end ** 2))
+    return math.sqrt(linear(t, start**2, end**2))
 
 
 def cosine(t, start, end, repeat=None):
@@ -76,7 +76,7 @@ def sine(t, start, end):
 
 
 def smooth_step(t, start, end):
-    t = (t ** 2) * (3 - (2 * t))
+    t = (t**2) * (3 - (2 * t))
     return linear(t, start, end)
 
 
@@ -108,6 +108,7 @@ def cubic_deccelaration(t, start, end):
 def sigmoid(t, start, end):
     t = 1 / (1 + math.exp(-t))
     return linear(t, start, end)
+
 
 # http://cubic-bezier.com
 
@@ -221,13 +222,11 @@ def ease_in_out_circ(t, start, end):
 
 # KAFX Equations
 def backstart(t, start, end):
-    return custom_curve(
-        t, (0, 0, 0.2, -0.3, 0.6, 0.26, 1, 1), start, end)
+    return custom_curve(t, (0, 0, 0.2, -0.3, 0.6, 0.26, 1, 1), start, end)
 
 
 def boing(t, start, end):
-    return custom_curve(
-        t, (0, 0, 0.42, 0.0, 0.58, 1.5, 1, 1), start, end)
+    return custom_curve(t, (0, 0, 0.42, 0.0, 0.58, 1.5, 1, 1), start, end)
 
 
 def interpolate_range(start, end, steps, func=linear, repeat=None):
@@ -254,12 +253,16 @@ def bezier_curve_range(steps, points):
 
 DEFAULT_INTERPOLATE = linear
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # print(
     #     list(interpolate_range(
     #         start=0, end=10, steps=20, func=cosine, repeat=8)))
     # print(list(interpolate_range(start=0, end=10, steps=20, func=sine)))
     vueltas = 3
     n = 10
-    print(list(int(round(math.degrees(radian), 0))
-               for radian in interpolate_range(0, vueltas * 2 * math.pi, n + 1)))
+    print(
+        list(
+            int(round(math.degrees(radian), 0))
+            for radian in interpolate_range(0, vueltas * 2 * math.pi, n + 1)
+        )
+    )

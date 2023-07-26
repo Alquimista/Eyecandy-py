@@ -1,60 +1,63 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 from collections import namedtuple
 from copy import copy
 from functools import partial
 from operator import attrgetter
-import re
 
 try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
+    from PyQt5 import QtCore, QtGui, QtWidgets
+
     # start qapplication
     app = QtWidgets.QApplication([])
 except ImportError:
-    from PyQt4 import QtGui, QtCore
+    from PyQt4 import QtCore, QtGui
+
     # start qapplication
     app = QtGui.QApplication([])
 
 try:
-    from reader import Reader
-    from writer import Writer
+    import helpers
     from asstime import Time
     from color import Color
-
-    import helpers
+    from reader import Reader
+    from writer import Writer
 
 except ImportError:
-    from .reader import Reader
-    from .writer import Writer
+    from . import helpers
     from .asstime import Time
     from .color import Color
-
-    from . import helpers
+    from .reader import Reader
+    from .writer import Writer
 
 RE_TAGS = re.compile(
-    r'''
+    r"""
     ({[\s\w\d\\-]+})*           # remove all the tags
                                 # {comment}{\be1}{\k86}fai{\k20}ry --> fairy
-    ''',
-    re.IGNORECASE | re.UNICODE | re.VERBOSE)
+    """,
+    re.IGNORECASE | re.UNICODE | re.VERBOSE,
+)
 
 RE_TAGS2 = re.compile(
-    r'''({[^k]+})*               # remove ssatags
-                                 # {comment}{\be1}{\k86}fai{\k20}ry -->
-                                 # {\k86}fai{\k20}ry
-    ''',
-    re.IGNORECASE | re.UNICODE | re.VERBOSE)
+    r"""({[^k]+})*              # remove assatags
+                                # {comment}{\be1}{\k86}fai{\k20}ry -->
+                                # {\k86}fai{\k20}ry
+    """,
+    re.IGNORECASE | re.UNICODE | re.VERBOSE,
+)
 
 RE_KARA = re.compile(
-    r'''
+    r"""
     {\\k[of]?(?P<duration>\d+)               # k duration in centiseconds
     (?:\-)*(?P<inline>[\w\d]+)*              # inline
     }(?P<text>[^\{\}]*)                      # text
-    ''',
-    re.IGNORECASE | re.UNICODE | re.VERBOSE)
+    """,
+    re.IGNORECASE | re.UNICODE | re.VERBOSE,
+)
 
 
-Resolution = namedtuple('Resolution', 'x, y')
+Resolution = namedtuple("Resolution", "x, y")
 
 
 class Text(object):
@@ -85,8 +88,7 @@ class Text(object):
 
         # Font
         font = QtGui.QFont(self._style.fontname)
-        font.setLetterSpacing(
-            QtGui.QFont.AbsoluteSpacing, self._style.spacing)
+        font.setLetterSpacing(QtGui.QFont.AbsoluteSpacing, self._style.spacing)
         font.setHintingPreference(QtGui.QFont.PreferNoHinting)
         font.setStyleStrategy(QtGui.QFont.PreferMatch)
         font.setPixelSize(self._style.fontsize * self._ssampling)
@@ -104,8 +106,7 @@ class Text(object):
         width = width * scaling * (self._style.scalex / 100)
         height = pixelsize * (self._style.scaley / 100)
 
-        return (round(width / self._ssampling, 4),
-                round(height / self._ssampling, 4))
+        return (round(width / self._ssampling, 4), round(height / self._ssampling, 4))
 
 
 class Metadata(object):
@@ -126,8 +127,10 @@ class Metadata(object):
     def as_dict(self):
         """Return a dict from instance variables"""
         return dict(
-            (key, getattr(self, key)) for key in dir(self)
-            if not key.startswith("_") and not key == "as_dict")
+            (key, getattr(self, key))
+            for key in dir(self)
+            if not key.startswith("_") and not key == "as_dict"
+        )
 
 
 class Video(object):
@@ -148,8 +151,10 @@ class Video(object):
     def as_dict(self):
         """Return a dict from instance variables"""
         return dict(
-            (key, getattr(self, key)) for key in dir(self)
-            if not key.startswith("_") and not key == "as_dict")
+            (key, getattr(self, key))
+            for key in dir(self)
+            if not key.startswith("_") and not key == "as_dict"
+        )
 
 
 class Dialog(object):
@@ -187,10 +192,14 @@ class Dialog(object):
             text = "{" + self.tag + "}" + text
         dialog_item = {
             "layer": self.layer,
-            "start": self.start.strtime, "end": self.end.strtime,
-            "style": self.style.as_dict(), "actor": self.actor,
-            "effect": self.effect, "text": text,
-            "comment": self.comment}
+            "start": self.start.strtime,
+            "end": self.end.strtime,
+            "style": self.style.as_dict(),
+            "actor": self.actor,
+            "effect": self.effect,
+            "text": text,
+            "comment": self.comment,
+        }
         return dialog_item
 
 
@@ -206,7 +215,7 @@ class Line(Dialog):
         self._asstext = Text(self.style, self.text)
         self.text = self._asstext.text
 
-        self._pos = self._position()    # for alignment in the center an5
+        self._pos = self._position()  # for alignment in the center an5
         # Line x
         self.left = self._pos[0]
         self.center = self._pos[1]
@@ -246,9 +255,9 @@ class Line(Dialog):
 
         align = self.style.alignment
         resx, resy = self._resolution
-        mv = self.style.marginv    # margen top/bottom
-        ml = self.style.marginl    # margen left
-        mr = self.style.marginr    # margen right
+        mv = self.style.marginv  # margen top/bottom
+        ml = self.style.marginl  # margen left
+        mr = self.style.marginr  # margen right
 
         # Alignment
         height = self.height
@@ -257,29 +266,29 @@ class Line(Dialog):
         middlewidth = width / 2
 
         # line x
-        if align == 1 or align == 4 or align == 7:      # left
+        if align == 1 or align == 4 or align == 7:  # left
             lleft = ml
             lcenter = lleft + middlewidth
             lright = lleft + width
-        elif align == 2 or align == 5 or align == 8:    # center
+        elif align == 2 or align == 5 or align == 8:  # center
             lleft = resx / 2 - middlewidth
             lcenter = lleft + middlewidth
             lright = lleft + width
-        elif align == 3 or align == 6 or align == 9:    # right
+        elif align == 3 or align == 6 or align == 9:  # right
             lleft = resx - mr - width
             lcenter = lleft + middlewidth
             lright = lleft + width
 
         # line y
-        if align == 7 or align == 8 or align == 9:      # top
+        if align == 7 or align == 8 or align == 9:  # top
             ltop = mv
             lmid = ltop + middleheight
             lbot = ltop + height
-        elif align == 4 or align == 5 or align == 6:    # middle
+        elif align == 4 or align == 5 or align == 6:  # middle
             lmid = resy / 2
             ltop = lmid - middleheight
             lbot = lmid + middleheight
-        elif align == 1 or align == 2 or align == 3:    # bottom
+        elif align == 1 or align == 2 or align == 3:  # bottom
             lbot = resy - mv
             lmid = lbot - middleheight
             ltop = lbot - height
@@ -325,9 +334,15 @@ class Line(Dialog):
 
             syl_item = {
                 "layer": self.layer,
-                "start": start.strtime, "end": end.strtime,
-                "style": style.as_dict(), "actor": actor, "inline": inline,
-                "effect": effect, "text": text.strip(), "comment": False}
+                "start": start.strtime,
+                "end": end.strtime,
+                "style": style.as_dict(),
+                "actor": actor,
+                "inline": inline,
+                "effect": effect,
+                "text": text.strip(),
+                "comment": False,
+            }
 
             syllabes.append(Syl(syl_item, self.resolution, sleft))
             sleft += width + postspace * spacewidth
@@ -337,7 +352,6 @@ class Line(Dialog):
     def _chars(self):
         charas = []
         for i, s in enumerate(self.syls):
-
             cleft = s.left
             line_start = s.start
             line_end = s.end
@@ -351,7 +365,6 @@ class Line(Dialog):
                 duration = Time(int(round(s.dur.ms / char_n, 0)))
 
             for ci, char in enumerate(s.text):
-
                 start = line_start
                 line_start += duration
 
@@ -366,10 +379,13 @@ class Line(Dialog):
 
                 char_item = {
                     "layer": s.layer,
-                    "start": start.strtime, "end": end.strtime,
-                    "style": s.style.as_dict(), "actor": s.actor,
+                    "start": start.strtime,
+                    "end": end.strtime,
+                    "style": s.style.as_dict(),
+                    "actor": s.actor,
                     "inline": s.inline,
-                    "effect": s.effect, "text": char.strip(),
+                    "effect": s.effect,
+                    "text": char.strip(),
                     "comment": False,
                     "sylstart": s.start,
                     "sylend": s.end,
@@ -463,16 +479,21 @@ class Style(object):
         style_item = {
             "name": self.name,
             "font": {"name": self.fontname, "size": self.fontsize},
-            "color": {"primary": self.primarycolor.ass_long,
-                      "secondary": self.secondarycolor.ass_long,
-                      "bord": self.bordcolor.ass_long,
-                      "shadow": self.shadowcolor.ass_long},
-            "bold": self.bold, "italic": self.italic,
+            "color": {
+                "primary": self.primarycolor.ass_long,
+                "secondary": self.secondarycolor.ass_long,
+                "bord": self.bordcolor.ass_long,
+                "shadow": self.shadowcolor.ass_long,
+            },
+            "bold": self.bold,
+            "italic": self.italic,
             "scale": [self.scalex, self.scaley],
-            "spacing": self.spacing, "bord": self.bord,
-            "shadow": self.shadow, "alignment": self.alignment,
-            "margin": {"l": self.marginl, "r": self.marginr,
-                       "v": self.marginv}}
+            "spacing": self.spacing,
+            "bord": self.bord,
+            "shadow": self.shadow,
+            "alignment": self.alignment,
+            "margin": {"l": self.marginl, "r": self.marginr, "v": self.marginv},
+        }
         return style_item
 
     def __eq__(self, other):
@@ -494,8 +515,14 @@ class Generator(object):
 
     """docstring for Generator"""
 
-    def __init__(self, input_script, output_script=None, progressbar=True,
-                 original=True, open=True):
+    def __init__(
+        self,
+        input_script,
+        output_script=None,
+        progressbar=True,
+        original=True,
+        open=True,
+    ):
         self._input_script = input_script
         self._output_script = output_script
         self.progressbar = progressbar
@@ -538,8 +565,7 @@ class Generator(object):
     def video(self):
         return Video(self._script_data["video"])
 
-    def add_video(self, path=None, zoom=None,
-                  position=None, ar=None):
+    def add_video(self, path=None, zoom=None, position=None, ar=None):
         if path:
             self._script_data["video"]["path"] = path
         if zoom:
@@ -553,8 +579,9 @@ class Generator(object):
     def metadata(self):
         return Metadata(self._script_data["metadata"])
 
-    def add_metadata(self, title=None, original_script=None,
-                     translation=None, timing=None):
+    def add_metadata(
+        self, title=None, original_script=None, translation=None, timing=None
+    ):
         if title:
             self._script_data["metadata"]["title"] = title
         if original_script:
@@ -572,8 +599,7 @@ class Generator(object):
             self._script_data["style"][name]["fix_width"] = fix_width
         else:
             for style in self._script_data["style"]:
-                self._script_data["style"][style][
-                    "fix_width"] = fix_width
+                self._script_data["style"][style]["fix_width"] = fix_width
 
     @property
     def styles(self):
@@ -582,12 +608,27 @@ class Generator(object):
             styles.append(self.get_style(key))
         return styles
 
-    def add_style(self, name="Default", fontname="Arial", fontsize=20,
-                  primarycolor="fff", secondarycolor="fff",
-                  bordcolor="000", shadowcolor="000",
-                  bold=False, italic=False, scalex=100, scaley=100,
-                  spacing=0, bord=2, shadow=0, alignment=2,
-                  marginl=10, marginr=20, marginv=10):
+    def add_style(
+        self,
+        name="Default",
+        fontname="Arial",
+        fontsize=20,
+        primarycolor="fff",
+        secondarycolor="fff",
+        bordcolor="000",
+        shadowcolor="000",
+        bold=False,
+        italic=False,
+        scalex=100,
+        scaley=100,
+        spacing=0,
+        bord=2,
+        shadow=0,
+        alignment=2,
+        marginl=10,
+        marginr=20,
+        marginv=10,
+    ):
         if not isinstance(primarycolor, Color):
             primarycolor = Color.from_hex(primarycolor)
         if not isinstance(secondarycolor, Color):
@@ -603,18 +644,23 @@ class Generator(object):
                 "primary": primarycolor.ass_long,
                 "secondary": secondarycolor.ass_long,
                 "bord": bordcolor.ass_long,
-                "shadow": shadowcolor.ass_long},
-            "bold": bold, "italic": italic, "scale": [scalex, scaley],
-            "spacing": spacing, "bord": bord,
-            "shadow": shadow, "alignment": alignment,
-            "margin": {"l": marginl, "r": marginr, "v": marginv}}
+                "shadow": shadowcolor.ass_long,
+            },
+            "bold": bold,
+            "italic": italic,
+            "scale": [scalex, scaley],
+            "spacing": spacing,
+            "bord": bord,
+            "shadow": shadow,
+            "alignment": alignment,
+            "margin": {"l": marginl, "r": marginr, "v": marginv},
+        }
         self._script_data["style"][name] = style_item
 
     @property
     def dialogs(self):
         D = partial(Dialog, resolution=self.resolution)
-        dialogs = [D(d) for d in self._script_data[
-            "dialog"] if d["comment"] == False]
+        dialogs = [D(d) for d in self._script_data["dialog"] if d["comment"] == False]
         if self.progressbar:
             return helpers.progressbar(dialogs)
         return dialogs
@@ -622,9 +668,18 @@ class Generator(object):
     def add(self, d):
         self._dialog.append(d.as_dict())
 
-    def add_dialog(self, layer=0, start=0, end=5000,
-                   style=None, actor="", effect="", text="",
-                   tag="", comment=False):
+    def add_dialog(
+        self,
+        layer=0,
+        start=0,
+        end=5000,
+        style=None,
+        actor="",
+        effect="",
+        text="",
+        tag="",
+        comment=False,
+    ):
         if not isinstance(start, Time):
             start = Time(start)
         if not isinstance(end, Time):
@@ -635,9 +690,14 @@ class Generator(object):
             style = style.as_dict()
         dialog_item = {
             "layer": layer,
-            "start": start.strtime, "end": end.strtime,
-            "style": style, "actor": actor,
-            "effect": effect, "text": text, "comment": comment}
+            "start": start.strtime,
+            "end": end.strtime,
+            "style": style,
+            "actor": actor,
+            "effect": effect,
+            "text": text,
+            "comment": comment,
+        }
         d = Dialog(dialog_item, self.resolution)
         d.tag = tag
         self.add(d)
@@ -645,8 +705,7 @@ class Generator(object):
     @property
     def lines(self):
         L = partial(Line, resolution=self.resolution)
-        lines = [L(l) for l in self._script_data[
-            "dialog"] if l["comment"] == False]
+        lines = [L(l) for l in self._script_data["dialog"] if l["comment"] == False]
         if self.progressbar:
             return helpers.progressbar(lines)
         return lines
@@ -655,11 +714,11 @@ class Generator(object):
         """Add the original karaoke commented by default in the script"""
         # This help to jump to the wanted line in the preview in Aegisub,
         # and/or keep a backup of the timed subs
-        self.add_dialog(text='### Original Karaoke ###', comment=True)
+        self.add_dialog(text="### Original Karaoke ###", comment=True)
         for d in self.dialogs:
             d.comment = True
             self.add(d)
-        self.add_dialog(text='### Karaoke Effect ###', comment=True)
+        self.add_dialog(text="### Karaoke Effect ###", comment=True)
 
     def tostring(self):
         # FIX: Don't change alignment in rawlines
@@ -711,24 +770,21 @@ class Generator(object):
 
 @helpers.timeit
 def main():
-
-    from asstags import *
-
-    import interpolate
     import random
+
     import color
+    import interpolate
+    from asstags import *
 
     it_custom = partial(interpolate.cosine, repeat=6)
 
-    sub = Generator("../tests/test.ass",
-                    "../tests/test_writer.ass")
+    sub = Generator("../tests/test.ass", "../tests/test_writer.ass")
 
     # an7: .left, .top    | an8: .center, .top    | an9: .right, .top
     # an4: .left, .middle | an5: .center, .middle | an6: .right, .middle
     # an1: .left, .bottom | an2: .center, .bottom | an3: .right, .bottom
 
     for line in sub.lines:
-
         c1 = line.style.primarycolor
         c2 = line.style.secondarycolor
         c3 = line.style.bordcolor
@@ -736,8 +792,7 @@ def main():
 
         cblue = color.Color.from_hex("#93BEC2")
         colorsb = list(cblue.gradient(c1, len(line.chars), it_custom))
-        i_custom = list(interpolate.interpolate_range(
-            0, 1, line.char_n, it_custom))
+        i_custom = list(interpolate.interpolate_range(0, 1, line.char_n, it_custom))
 
         for li, char in enumerate(line.chars):
             # alias for .center, .middle
@@ -745,8 +800,14 @@ def main():
 
             # Efecto de silaba
             ch = char.copy()
-            ch.tag = (pos(x, y) + blur() + c(c2) + fsc(130) +
-                      t(fsc(100) + blur(2) + c(colorsb[li])) + an(1))
+            ch.tag = (
+                pos(x, y)
+                + blur()
+                + c(c2)
+                + fsc(130)
+                + t(fsc(100) + blur(2) + c(colorsb[li]))
+                + an(1)
+            )
             ch.layer = 1
             ch.end = char.end + 50
             if ch.end.ms >= line.end.ms:
@@ -790,5 +851,5 @@ def main():
     sub.save()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,32 +1,30 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
-from __future__ import (absolute_import, division,
-                        with_statement, print_function)
+# -*- coding:utf-8 -*-
+from __future__ import absolute_import, division, print_function, with_statement
 
-import math
 import cmath
+import math
 import operator
-import re
 import random
+import re
 
 try:
     import color
+    import interpolate
     from color import Color
     from helpers import round_format_str
-    import interpolate
 except ImportError:
-    from . import color
+    from . import color, interpolate
     from .color import Color
     from .helpers import round_format_str
-    from . import interpolate
 
 
 def distanceND(p1, p2):
     if not p2:
         p2 = p1
         p1 = 0, 0
-    assert len(p1) == len(p2), 'Vector sizes must match'
-    return math.sqrt(math.fsum((p1 - p2)**2 for p1, p2 in zip(p1, p2)))
+    assert len(p1) == len(p2), "Vector sizes must match"
+    return math.sqrt(math.fsum((p1 - p2) ** 2 for p1, p2 in zip(p1, p2)))
 
 
 def distance(x1, y1, x2=None, y2=None):
@@ -70,17 +68,17 @@ def randf(v1=None, v2=None):
 
 def rand_range(n, v1, v2=None):
     for i in range(n):
-        yield(rand(v1, v2))
+        yield (rand(v1, v2))
 
 
 def randf_range(n, v1=None, v2=None):
     for i in range(n):
-        yield(randf(v1, v2))
+        yield (randf(v1, v2))
 
 
 def dec2hex(decimal):
     """Convierte un numero decimal a Hexadecimal."""
-    return '{:02X}'.format(decimal)
+    return "{:02X}".format(decimal)
 
 
 def hex2dec(hexstring):
@@ -133,7 +131,7 @@ def bord(xb=1, yb=None):
     '\\xbord1.5\\ybord2'
     """
     if yb is None or xb == yb:
-        return '\\bord' + round_format_str(xb, 2)
+        return "\\bord" + round_format_str(xb, 2)
     else:
         return xbord(xb) + ybord(yb)
 
@@ -151,7 +149,7 @@ def shad(xs=1, ys=None):
     """
     if ys is None:
         # igual que shad
-        return '\\shad' + round_format_str(xs, 2)
+        return "\\shad" + round_format_str(xs, 2)
     else:
         return xshad(xs) + yshad(ys)
 
@@ -167,21 +165,21 @@ def be(strength=1):
     @strength: intensidad del difuminado
     @dx, @dy: distancia en x, y
     """
-    return '\\be' + str(int(math.ceil(strength)))
+    return "\\be" + str(int(math.ceil(strength)))
 
 
 def fscx(scale=100):
     """
     Escalado del ancho del texto.
     """
-    return '\\fscx{:d}'.format(int(math.ceil(scale)))
+    return "\\fscx{:d}".format(int(math.ceil(scale)))
 
 
 def fscy(scale=100):
     """
     Escalado del alto del texto.
     """
-    return '\\fscy{:d}'.format(int(math.ceil(scale)))
+    return "\\fscy{:d}".format(int(math.ceil(scale)))
 
 
 def fsc(x=100, y=None):
@@ -200,17 +198,17 @@ def fsc(x=100, y=None):
 
 def frx(amount):
     """Gira el texto a lo largo de "x"."""
-    return '\\frx' + round_format_str(amount, 8)
+    return "\\frx" + round_format_str(amount, 8)
 
 
 def fry(amount):
     """Gira el texto a lo largo de "y"."""
-    return '\\fry' + round_format_str(amount, 8)
+    return "\\fry" + round_format_str(amount, 8)
 
 
 def fr(amount):
     """Gira el texto a lo largo de "z"."""
-    return '\\frz' + round_format_str(amount, 8)
+    return "\\frz" + round_format_str(amount, 8)
 
 
 def c(arg1, arg2=None):
@@ -244,16 +242,17 @@ def c(arg1, arg2=None):
         else:
             color = Color.from_hex(arg2)
         if tipo not in (1, 2, 3, 4):
-            raise ValueError('\n\nc(tipo,valor):\n<tipo> solo acepta'
-                             ' numeros entre 1 y 4')
+            raise ValueError(
+                "\n\nc(tipo,valor):\n<tipo> solo acepta" " numeros entre 1 y 4"
+            )
         else:
-            return '\\{:d}c{:s}'.format(tipo, color.ass)
+            return "\\{:d}c{:s}".format(tipo, color.ass)
     else:
         if isinstance(arg1, Color):
             color = arg1
         else:
             color = Color.from_hex(arg1)
-        return '\\c{:s}'.format(color.ass)
+        return "\\c{:s}".format(color.ass)
 
 
 def a(arg1, arg2=None):
@@ -286,17 +285,18 @@ def a(arg1, arg2=None):
         except (TypeError, ValueError):
             alfa = dec2hex(hex2dec(opacity))
         if tipo not in (1, 2, 3, 4):
-            raise ValueError('\n\nc(tipo,valor):\n'
-                             '<tipo> solo acepta numeros entre 1 y 4')
+            raise ValueError(
+                "\n\nc(tipo,valor):\n" "<tipo> solo acepta numeros entre 1 y 4"
+            )
         else:
-            return '\\{:d}a&H{:s}&'.format(tipo, alfa)
+            return "\\{:d}a&H{:s}&".format(tipo, alfa)
     else:
         opacity = arg1
         try:
             alfa = dec2hex(opacity)
         except (TypeError, ValueError):
             alfa = dec2hex(hex2dec(opacity))
-        return '\\alpha&H{:s}&'.format(alfa)
+        return "\\alpha&H{:s}&".format(alfa)
 
 
 def an(pos=5):
@@ -316,16 +316,16 @@ def an(pos=5):
     """
     apos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     if pos not in apos:
-        raise ValueError('\n\nan(pos):\n<pos> solo acepta los '
-                         'sigientes valores: ' + str(apos))
+        raise ValueError(
+            "\n\nan(pos):\n<pos> solo acepta los " "sigientes valores: " + str(apos)
+        )
     else:
-        return '\\an{:d}'.format(pos)
+        return "\\an{:d}".format(pos)
 
 
 def pos(x, y):
     """Aplica la posición del texto."""
-    return '\\pos({:s},{:s})'.format(
-        round_format_str(x, 4), round_format_str(y, 4))
+    return "\\pos({:s},{:s})".format(round_format_str(x, 4), round_format_str(y, 4))
 
 
 def move(arg1, arg2, arg3, arg4, arg5=None, arg6=None):
@@ -338,14 +338,13 @@ def move(arg1, arg2, arg3, arg4, arg5=None, arg6=None):
     if arg5 == None and arg6 == None:
         x1, y1 = round_format_str(arg1, 4), round_format_str(arg2, 4)
         x2, y2 = round_format_str(arg3, 4), round_format_str(arg4, 4)
-        return '\\move({:s},{:s},{:s},{:s})'.format(x1, y1, x2, y2)
+        return "\\move({:s},{:s},{:s},{:s})".format(x1, y1, x2, y2)
     else:
         ti = arg5
         tf = arg6
         x1, y1 = round_format_str(arg1), round_format_str(arg2, 4)
         x2, y2 = round_format_str(arg3), round_format_str(arg4, 4)
-        return '\\move({:s},{:s},{:s},{:s},{:d},{:d})'.format(
-            x1, y1, x2, y2, ti, tf)
+        return "\\move({:s},{:s},{:s},{:s},{:d},{:d})".format(x1, y1, x2, y2, ti, tf)
 
 
 def mov(x1, y1, ix, iy, t1=None, t2=None):
@@ -368,32 +367,36 @@ def mov(x1, y1, ix, iy, t1=None, t2=None):
 
 def org(x, y):
     """Origen de rotación."""
-    return '\\org({:s},{:s})'.format(
-        round_format_str(x, 4), round_format_str(y, 4))
+    return "\\org({:s},{:s})".format(round_format_str(x, 4), round_format_str(y, 4))
 
 
 def fad(ac1, ac2=None, ac3=None, t1=None, t2=None, t3=None, t4=None):
     """Desvanecimiento del texto."""
-    if (t1 is None and t2 is None
-            and t3 is None and t4 is None):
+    if t1 is None and t2 is None and t3 is None and t4 is None:
         dur1, dur2, linedur = ac1, ac2, ac3
         if linedur is None:
             if dur2 is None:
-                return '\\fad({:d},{:d})'.format(dur1, dur1)
+                return "\\fad({:d},{:d})".format(dur1, dur1)
             else:
-                return '\\fad({:d},{:d})'.format(dur1, dur2)
+                return "\\fad({:d},{:d})".format(dur1, dur2)
         else:
             start, end = ac1, ac2
             # Desvanecimiento del texto, este usa transición de alphas.
-            return '%s\\t(%d,%d,%s)\\t(%d,%d,%s)' % (
-                a('ff'),
-                0, dur1, a('00'),
-                linedur - dur2, linedur, a('ff'))
+            return "%s\\t(%d,%d,%s)\\t(%d,%d,%s)" % (
+                a("ff"),
+                0,
+                dur1,
+                a("00"),
+                linedur - dur2,
+                linedur,
+                a("ff"),
+            )
     else:
         t1, t2 = round_format_str(t1, 2), round_format_str(t2, 2)
         t3, t4 = round_format_str(t3, 2), round_format_str(t4, 2)
-    return '\\fade({:s},{:s},{:s},{:s},{:s},{:s},{:s})'.format(
-        ac1, ac2, ac3, t1, t2, t3, t4)
+    return "\\fade({:s},{:s},{:s},{:s},{:s},{:s},{:s})".format(
+        ac1, ac2, ac3, t1, t2, t3, t4
+    )
 
 
 def t(arg1, arg2=None, arg3=None, arg4=None):
@@ -420,19 +423,23 @@ def t(arg1, arg2=None, arg3=None, arg4=None):
     """
     if arg2 == None and arg3 == None and arg4 == None:
         modifiers = arg1
-        return '\\t({:s})'.format(arg1)
+        return "\\t({:s})".format(arg1)
     elif arg3 == None and arg4 == None:
         accel, modifiers = arg1, arg2
-        return '\\t({:s},{:s})'.format(round_format_str(accel), modifiers)
+        return "\\t({:s},{:s})".format(round_format_str(accel), modifiers)
     elif arg4 == None:
         t1, t2, modifiers = arg1, arg2, arg3
-        return '\\t({:s},{:s},{:s})'.format(
-            round_format_str(t1), round_format_str(t2), modifiers)
+        return "\\t({:s},{:s},{:s})".format(
+            round_format_str(t1), round_format_str(t2), modifiers
+        )
     else:
         t1, t2, accel, modifiers = arg1, arg2, arg3, arg4
-        return '\\t({:s},{:s},{:s},{:s})'.format(
-            round_format_str(t1), round_format_str(t2),
-            round_format_str(accel), modifiers)
+        return "\\t({:s},{:s},{:s},{:s})".format(
+            round_format_str(t1),
+            round_format_str(t2),
+            round_format_str(accel),
+            modifiers,
+        )
 
 
 def clip(x1, y1=None, x2=None, y2=None, reverse=False):
@@ -446,22 +453,22 @@ def clip(x1, y1=None, x2=None, y2=None, reverse=False):
     if reverse:
         tipo = "i"
     if y1 == None and x2 == None and y2 == None:
-        vector = x1    # clip vectorial
-        return '\\{:s}clip({:s})'.format(tipo, vector)
+        vector = x1  # clip vectorial
+        return "\\{:s}clip({:s})".format(tipo, vector)
     elif x2 == None and y2 == None:
-        scale, vector = x1, y1    # clip vectorial
-        return '\\{:s}clip({:d},{:s})'.format(tipo, scale, vector)
+        scale, vector = x1, y1  # clip vectorial
+        return "\\{:s}clip({:d},{:s})".format(tipo, scale, vector)
     else:
         x1, y1 = int(math.ceil(x1)), int(math.ceil(y1))
         x2, y2 = int(math.ceil(x2)), int(math.ceil(y2))
-        return '\\{:s}clip({:d},{:d},{:d},{:d})'.format(tipo, x1, y1, x2, y2)
+        return "\\{:s}clip({:d},{:d},{:d},{:d})".format(tipo, x1, y1, x2, y2)
 
 
 def p(mode, code=None):
     """Dibuja la figura especificada."""
     if not code:
         code, mode = mode, 1
-    return '{\\p%d}%s{\\p0}' % (mode, code)
+    return "{\\p%d}%s{\\p0}" % (mode, code)
 
 
 def blur(strength=1, dx=None, dy=None):
@@ -474,7 +481,7 @@ def blur(strength=1, dx=None, dy=None):
     @blr: intensidad del blur
     @dx, @dy: distancia en x, y
     """
-    return '\\blur' + round_format_str(strength, 2)
+    return "\\blur" + round_format_str(strength, 2)
 
 
 def fax(factor):
@@ -482,37 +489,37 @@ def fax(factor):
     # Usually factor will be a small number,
     # not larger than 2 as that creates a very strong distortion.
     if factor > 2:
-        return '\\fax2'
+        return "\\fax2"
     else:
-        return '\\fax' + round_format_str(factor)
+        return "\\fax" + round_format_str(factor)
 
 
 def fay(factor):
     """Distorsión de perspectiva del texto en "y"."""
     if factor > 2:
-        return '\\fay2'
+        return "\\fay2"
     else:
-        return '\\fay' + round_format_str(factor)
+        return "\\fay" + round_format_str(factor)
 
 
 def xbord(valor=1):
     """Tamaño del Borde en "x"."""
-    return '\\xbord' + round_format_str(valor, 2)
+    return "\\xbord" + round_format_str(valor, 2)
 
 
 def ybord(valor=1):
     """Tamaño del Borde en "y"."""
-    return '\\ybord' + round_format_str(valor, 2)
+    return "\\ybord" + round_format_str(valor, 2)
 
 
 def xshad(depth=1):
     """Que tan alejada esta la sombra del texto en el eje de las "x"."""
-    return '\\xshad' + round_format_str(depth, 2)
+    return "\\xshad" + round_format_str(depth, 2)
 
 
 def yshad(depth=1):
     """Que tan alejada esta la sombra del texto en el eje de las "y"."""
-    return '\\yshad' + round_format_str(depth, 2)
+    return "\\yshad" + round_format_str(depth, 2)
 
 
 def cycletags(inicio, duracion, intervalo, *tags):
@@ -531,7 +538,7 @@ def cycletags(inicio, duracion, intervalo, *tags):
     """
     i = 0
     n = len(tags)
-    ttags = ''
+    ttags = ""
     start_time = inicio
     end_time = start_time + intervalo
     while end_time < duracion:
@@ -557,8 +564,13 @@ def draw(tipo, x, y):
     draw("m", 10, 30)
     >>> 'm 10 30 '
     """
-    return '{:s} {:s} {:s} '.format(
-        tipo, round_format_str(x, ), round_format_str(y, 2))
+    return "{:s} {:s} {:s} ".format(
+        tipo,
+        round_format_str(
+            x,
+        ),
+        round_format_str(y, 2),
+    )
 
 
 def draw_shape(*points):
@@ -571,17 +583,21 @@ def draw_shape(*points):
 
 
 def draw_bezier(x1, y1, x2, y2, x3, y3):
-    return 'b %s %s %s %s %s %s ' % (
-        round_format_str(x1, 2), round_format_str(y1, 2),
-        round_format_str(x2, 2), round_format_str(y2, 2),
-        round_format_str(x3, 2), round_format_str(y3, 2))
+    return "b %s %s %s %s %s %s " % (
+        round_format_str(x1, 2),
+        round_format_str(y1, 2),
+        round_format_str(x2, 2),
+        round_format_str(y2, 2),
+        round_format_str(x3, 2),
+        round_format_str(y3, 2),
+    )
 
 
 def draw_spline(*posiciones):
-    bspline = 's '
+    bspline = "s "
     for pos in posiciones:
-        bspline += '%s ' % round_format_str(pos, 2)
-    return bspline + ' c'
+        bspline += "%s " % round_format_str(pos, 2)
+    return bspline + " c"
 
 
 def shape_poligon(radio, lados):
@@ -605,9 +621,9 @@ def shape_poligon(radio, lados):
     for i in range(lados + 1):
         # ass draw commands
         if i == 0:
-            dcommand = "m"    # start drawing
+            dcommand = "m"  # start drawing
         else:
-            dcommand = "l"    # join points with lines
+            dcommand = "l"  # join points with lines
         # convert polar to rectangular
         pdraw.append(draw(dcommand, *polar2rec(radio, angle)))
         angle += iangle
@@ -630,9 +646,9 @@ def shape_star(radio1, radio2, spikes):
     for i in range(spikes + 1):
         # ass draw commands
         if i == 0:
-            dcommand = "m"    # start drawing
+            dcommand = "m"  # start drawing
         else:
-            dcommand = "l"    # join points with lines
+            dcommand = "l"  # join points with lines
         # convert polar to rectangular
         pdraw.append(draw(dcommand, *polar2rec(radio1, angle1)))
         pdraw.append(draw("l", *polar2rec(radio2, angle2)))
@@ -654,7 +670,6 @@ def shape_pentagon(r):
 
 
 def shape_circle(radio, substract=False):
-
     def resize(m):
         num = (float(m.group(0)) / 100) * radio * 2
         return round_format_str(num, 2)
@@ -662,8 +677,10 @@ def shape_circle(radio, substract=False):
     def swap_coords(m):
         return m.group(2) + " " + m.group(1)
 
-    shape = ("m 50 0 b 22 0 0 22 0 50 b 0 78 22 100 50 100 b "
-             "78 100 100 78 100 50 b 100 22 78 0 50 0 ")
+    shape = (
+        "m 50 0 b 22 0 0 22 0 50 b 0 78 22 100 50 100 b "
+        "78 100 100 78 100 50 b 100 22 78 0 50 0 "
+    )
 
     if substract:
         shape = shape_filter(shape, swap_coords)
@@ -672,7 +689,6 @@ def shape_circle(radio, substract=False):
 
 
 def shape_ellipse(w, h):
-
     def rstr(n):
         return round_format_str(n, 2)
 
@@ -682,13 +698,36 @@ def shape_ellipse(w, h):
         "b %d %s %d %d %s %d "
         "%s %d %s %d %s %s "
         "%s %s %s %s %s %s "
-        "%s %s %d %s %d %s")
+        "%s %s %d %s %d %s"
+    )
     return shape % (
-        0, rstr(h2),  # move
-        0, rstr(h2), 0, 0, rstr(w2), 0,  # curve 1
-        rstr(w2), 0, rstr(w), 0, rstr(w), rstr(h2),  # curve 2
-        rstr(w), rstr(h2), rstr(w), rstr(h), rstr(w2), rstr(h),  # curve 3
-        rstr(w2), rstr(h), 0, rstr(h), 0, rstr(h2))  # curve 4
+        0,
+        rstr(h2),  # move
+        0,
+        rstr(h2),
+        0,
+        0,
+        rstr(w2),
+        0,  # curve 1
+        rstr(w2),
+        0,
+        rstr(w),
+        0,
+        rstr(w),
+        rstr(h2),  # curve 2
+        rstr(w),
+        rstr(h2),
+        rstr(w),
+        rstr(h),
+        rstr(w2),
+        rstr(h),  # curve 3
+        rstr(w2),
+        rstr(h),
+        0,
+        rstr(h),
+        0,
+        rstr(h2),
+    )  # curve 4
 
 
 def shape_pixel():
@@ -698,24 +737,28 @@ def shape_pixel():
 def shape_square(width=1, height=None):
     if not height:
         height = width
-    pt = draw('m', 0, 0)
-    pt += draw('l', width, 0)
-    pt += draw('l', width, height)
-    pt += draw('l', 0, height)
+    pt = draw("m", 0, 0)
+    pt += draw("l", width, 0)
+    pt += draw("l", width, height)
+    pt += draw("l", 0, height)
     return pt
 
 
 def shape_triangle(size):
-
     def rstr(n):
         return round_format_str(n, 2)
 
     h = math.sqrt(3) * (size / 2)
     base = -h
-    shape = 'm %s %s l %s %s 0 %s %s %s' % (
-        rstr(size / 2), rstr(base),
-        rstr(size), rstr(base + h),
-        rstr(base + h), rstr(size / 2), rstr(base))
+    shape = "m %s %s l %s %s 0 %s %s %s" % (
+        rstr(size / 2),
+        rstr(base),
+        rstr(size),
+        rstr(base + h),
+        rstr(base + h),
+        rstr(size / 2),
+        rstr(base),
+    )
     return translate_shape(shape, 0, h)
 
 
@@ -728,13 +771,11 @@ def shape_ring(radio, outline_width):
 
 
 def shape_heart(size=30):
-
     def resize(m):
         num = (float(m.group(0)) / 30) * size
         return round_format_str(num, 2)
 
-    path = ("m 15 30 b 27 22 30 18 30 14 30 8 22 "
-            "0 15 10 8 0 0 8 0 14 0 18 3 22 15 30")
+    path = "m 15 30 b 27 22 30 18 30 14 30 8 22 " "0 15 10 8 0 0 8 0 14 0 18 3 22 15 30"
     return re.sub("\d+", resize, path)
 
 
@@ -743,7 +784,6 @@ def shape_filter(shape, function):
 
 
 def shape_max(shape):
-
     def abs_float(n):
         return abs(float(n))
 
@@ -755,7 +795,6 @@ def shape_max(shape):
 
 
 def shape_min(shape):
-
     def abs_float(n):
         return abs(float(n))
 
@@ -789,7 +828,6 @@ def rotate_shape(shape, angle):
 
 
 def translate_shape(shape, x, y):
-
     def move(m):
         px, py = float(m.group(1)) + x, float(m.group(2)) + y
         return round_format_str(px, 2) + " " + round_format_str(py, 2)
@@ -803,7 +841,6 @@ def translate_shape(shape, x, y):
 
 
 def scale_shape(shape, x, y=None):
-
     if not y:
         y = x
 
@@ -815,7 +852,6 @@ def scale_shape(shape, x, y=None):
 
 
 def flip_shape(shape):
-
     def flip(m):
         return str(0 - int(m.group(1))) + " " + m.group(2)
 
@@ -839,5 +875,5 @@ def shape_to_bezier(steps, shape):
 #     ass_commands "mlbsc"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(shape_circle(10))
